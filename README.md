@@ -1,6 +1,6 @@
 # Nova AI Chatbot
 
-A beautiful, responsive general-purpose chatbot powered by OpenAI's GPT-3.5 Turbo model. Built with pure HTML, CSS, and JavaScript for the K-HUB 2025-26 Batch recruitment challenge.
+A beautiful, responsive general-purpose chatbot powered by OpenAI's GPT-3.5 Turbo model. Built with HTML, CSS, JavaScript, and Node.js backend.
 
 ![Nova AI Chatbot](https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200)
 
@@ -11,7 +11,7 @@ A beautiful, responsive general-purpose chatbot powered by OpenAI's GPT-3.5 Turb
 - **📱 Fully Responsive**: Optimized for desktop, tablet, and mobile devices
 - **💾 Local Storage**: Persistent chat history saved in browser
 - **🎨 Beautiful UI**: Modern design with animations and gradients
-- **⚡ Fast Performance**: Pure JavaScript implementation
+- **⚡ Fast Performance**: Optimized Node.js backend with Express
 - **🔄 Chat Management**: Create, switch, and delete chat sessions
 - **✨ Quick Actions**: Pre-defined prompts for common use cases
 
@@ -19,46 +19,84 @@ A beautiful, responsive general-purpose chatbot powered by OpenAI's GPT-3.5 Turb
 
 ### Prerequisites
 
-- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Node.js (v14 or higher)
 - OpenAI API key
-- Local web server (optional, for development)
 
-### Installation
+### Local Development
 
-1. **Download the files**
+1. **Clone the repository**
    ```bash
    git clone https://github.com/yourusername/nova-chatbot.git
    cd nova-chatbot
    ```
 
-2. **Configure API Key**
-   
-   Open `script.js` and replace the API key in the CONFIG object:
-   ```javascript
-   const CONFIG = {
-       API_KEY: 'your_openai_api_key_here',
-       // ... other config
-   };
+2. **Install dependencies**
+   ```bash
+   npm install
    ```
 
-3. **Run the application**
-   
-   **Option 1: Direct file opening**
-   - Simply open `index.html` in your web browser
-   
-   **Option 2: Local server (recommended)**
+3. **Set up environment variables**
    ```bash
-   # Using Python
-   python -m http.server 8000
-   
-   # Using Node.js
-   npx serve .
-   
-   # Using PHP
-   php -S localhost:8000
+   cp .env.example .env
+   # Edit .env and add your OpenAI API key
    ```
-   
-   Then visit `http://localhost:8000`
+
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   Navigate to `http://localhost:8000`
+
+## 🌐 Deployment
+
+### Deploy to Render
+
+1. **Create a new Web Service on Render**
+   - Connect your GitHub repository
+   - Use the following settings:
+     - **Build Command**: `npm install`
+     - **Start Command**: `npm start`
+
+2. **Set Environment Variables**
+   - `OPENAI_API_KEY`: Your OpenAI API key
+   - `NODE_ENV`: `production`
+
+3. **Deploy**
+   - Render will automatically deploy your application
+   - Your app will be available at your Render URL
+
+### Deploy to Heroku
+
+1. **Install Heroku CLI and login**
+   ```bash
+   heroku login
+   ```
+
+2. **Create a new Heroku app**
+   ```bash
+   heroku create your-app-name
+   ```
+
+3. **Set environment variables**
+   ```bash
+   heroku config:set OPENAI_API_KEY=your_api_key_here
+   heroku config:set NODE_ENV=production
+   ```
+
+4. **Deploy**
+   ```bash
+   git push heroku main
+   ```
+
+### Deploy to Railway
+
+1. **Connect your GitHub repository to Railway**
+2. **Set environment variables**:
+   - `OPENAI_API_KEY`: Your OpenAI API key
+   - `NODE_ENV`: `production`
+3. **Deploy automatically**
 
 ## 🔑 Getting Your OpenAI API Key
 
@@ -75,11 +113,6 @@ A beautiful, responsive general-purpose chatbot powered by OpenAI's GPT-3.5 Turb
    - Go to [Billing settings](https://platform.openai.com/account/billing)
    - Add a payment method to enable API usage
 
-4. **Configure the Application**
-   - Open `script.js`
-   - Replace `'your_openai_api_key_here'` with your actual API key
-   - Save the file
-
 ## 📖 Usage Guide
 
 ### Starting a Conversation
@@ -95,90 +128,54 @@ A beautiful, responsive general-purpose chatbot powered by OpenAI's GPT-3.5 Turb
 - **Delete Chats**: Hover over a chat and click the trash icon
 - **Clear Chat**: Use the clear button in the header to reset the current conversation
 
-### Features Overview
-
-- **Responsive Design**: Works seamlessly on all device sizes
-- **Auto-save**: All conversations are automatically saved to browser storage
-- **Typing Indicators**: Visual feedback when Nova is generating a response
-- **Character Counter**: Shows remaining characters (2000 max per message)
-- **Toast Notifications**: Success and error messages for user feedback
-
 ## 🛠️ Technology Stack
 
-- **Frontend**: Pure HTML5, CSS3, JavaScript (ES6+)
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Backend**: Node.js, Express.js
+- **API**: OpenAI GPT-3.5 Turbo
+- **Storage**: Browser LocalStorage
 - **Styling**: Custom CSS with Flexbox and Grid
 - **Icons**: Font Awesome 6
 - **Fonts**: Inter (Google Fonts)
-- **API**: OpenAI GPT-3.5 Turbo
-- **Storage**: Browser LocalStorage
 
 ## 🏗️ Project Structure
 
 ```
 nova-chatbot/
 ├── index.html          # Main HTML file
+├── login.html          # Login page
 ├── styles.css          # All CSS styles and animations
-├── script.js           # JavaScript functionality
+├── script.js           # Frontend JavaScript
+├── server.js           # Node.js Express server
+├── package.json        # Dependencies and scripts
+├── render.yaml         # Render deployment config
+├── .env.example        # Environment variables template
 └── README.md           # This documentation
 ```
 
-## 🎨 Design Features
+## 🔧 Configuration
 
-### Visual Elements
-- **Gradient Backgrounds**: Beautiful color transitions
-- **Floating Animations**: Subtle background elements
-- **Smooth Transitions**: All interactions have smooth animations
-- **Modern Typography**: Clean, readable font choices
-- **Responsive Layout**: Adapts to any screen size
+### Environment Variables
 
-### User Experience
-- **Intuitive Interface**: Easy to understand and navigate
-- **Quick Actions**: Pre-defined prompts for common tasks
-- **Visual Feedback**: Loading states, typing indicators, and notifications
-- **Accessibility**: Keyboard navigation and screen reader friendly
+- `OPENAI_API_KEY`: Your OpenAI API key (required)
+- `NODE_ENV`: Set to `production` for production deployment
+- `PORT`: Server port (default: 8000)
 
-## 📱 Responsive Breakpoints
+### API Configuration
 
-- **Desktop**: > 768px - Full sidebar and expanded layout
-- **Tablet**: 768px - 480px - Collapsible sidebar
-- **Mobile**: < 480px - Optimized for touch interaction
+The chatbot uses the following OpenAI API settings:
+- **Model**: `gpt-3.5-turbo`
+- **Max Tokens**: 1000
+- **Temperature**: 0.7
 
-## 🔧 Configuration Options
-
-You can customize the chatbot by modifying the CONFIG object in `script.js`:
-
-```javascript
-const CONFIG = {
-    API_KEY: 'your_api_key',           // Your OpenAI API key
-    API_URL: 'https://api.openai.com/v1/chat/completions',
-    MODEL: 'gpt-3.5-turbo',            // AI model to use
-    MAX_TOKENS: 1000,                  // Maximum response length
-    TEMPERATURE: 0.7                   // Response creativity (0-1)
-};
-```
-
-## 🚀 Deployment
-
-### GitHub Pages
-1. Push your code to a GitHub repository
-2. Go to repository Settings > Pages
-3. Select source branch (usually `main`)
-4. Your site will be available at `https://username.github.io/repository-name`
-
-### Netlify
-1. Drag and drop your project folder to [Netlify](https://netlify.com)
-2. Your site will be deployed instantly with a custom URL
-
-### Vercel
-1. Install Vercel CLI: `npm i -g vercel`
-2. Run `vercel` in your project directory
-3. Follow the prompts to deploy
+You can modify these in the `server.js` file if needed.
 
 ## 🔒 Security Considerations
 
-- **API Key Protection**: In production, use environment variables or a backend proxy
-- **CORS**: The current setup works for development; consider a backend for production
-- **Rate Limiting**: Implement client-side rate limiting to avoid API quota issues
+- **API Key Protection**: Store your OpenAI API key in environment variables
+- **CORS**: Properly configured for cross-origin requests
+- **Rate Limiting**: Consider implementing rate limiting for production use
+- **Input Validation**: Basic input validation is implemented
 
 ## 🤝 Contributing
 
@@ -197,7 +194,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [OpenAI](https://openai.com/) for providing the GPT-3.5 Turbo API
 - [Font Awesome](https://fontawesome.com/) for the beautiful icons
 - [Google Fonts](https://fonts.google.com/) for the Inter font family
-- [K-HUB](https://k-hub.in/) for the internship opportunity
 
 ## 📞 Support
 
@@ -211,10 +207,11 @@ For questions or support:
 - **v1.0.0** - Initial release with core chat functionality
 - **v1.1.0** - Added responsive design and mobile optimization
 - **v1.2.0** - Enhanced UI with animations and improved UX
+- **v2.0.0** - Added Node.js backend with proper API integration
 
 ---
 
-Built with ❤️ for the K-HUB 2025-26 Batch recruitment challenge.
+Built with ❤️ for real-time AI conversations.
 
 **Live Demo**: [Add your deployment URL here]
 

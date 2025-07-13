@@ -6,18 +6,17 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "vite build",
-    "heroku-postbuild": "npm run build"
+    "build": "echo 'No build step required for static files'",
+    "heroku-postbuild": "npm install"
   },
   "dependencies": {
     "express": "^4.18.2",
     "node-fetch": "^2.6.7"
   },
-  "devDependencies": {
-    "vite": "^5.4.2",
-    "@vitejs/plugin-react": "^4.3.1"
+  "engines": {
+    "node": ">=14.0.0"
   },
-  "keywords": ["chatbot", "ai", "openai", "javascript"],
+  "keywords": ["chatbot", "ai", "openai", "javascript", "nodejs"],
   "author": "Your Name",
   "license": "MIT"
 }

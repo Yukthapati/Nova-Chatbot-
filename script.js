@@ -1,6 +1,8 @@
 // Configuration
 const CONFIG = {
-    API_URL: '/.netlify/functions/chat',
+    API_URL: window.location.hostname === 'localhost' ? 
+        'http://localhost:8000/api/chat' : 
+        '/api/chat',
     MODEL: 'gpt-3.5-turbo',
     MAX_TOKENS: 1000,
     TEMPERATURE: 0.7
@@ -278,8 +280,6 @@ async function sendMessage() {
 }
 
 async function getAIResponse(message) {
-    const chat = chatHistory.find(c => c.id === currentChatId);
-    
     const response = await fetch(CONFIG.API_URL, {
         method: 'POST',
         headers: {
@@ -292,6 +292,8 @@ async function getAIResponse(message) {
     });
     
     if (!response.ok) {
+        const errorData = await response.text();
+        console.error('API Error:', response.status, errorData);
         throw new Error(`API request failed: ${response.status}`);
     }
     
