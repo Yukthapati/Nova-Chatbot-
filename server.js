@@ -24,15 +24,21 @@ app.use((req, res, next) => {
 
 // Chat API endpoint
 app.post('/api/chat', async (req, res) => {
+  console.log('Received chat request:', { message: req.body.message, sessionId: req.body.sessionId });
+  
   try {
     const { message, sessionId } = req.body;
 
     if (!message) {
+      console.log('Error: No message provided');
       return res.status(400).json({ error: 'Message is required' });
     }
 
     // Check if API key is properly configured
     const apiKey = process.env.OPENAI_API_KEY || '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';
+    
+    console.log('API Key configured:', apiKey ? 'Yes' : 'No');
+    console.log('API Key format valid:', apiKey.startsWith('sk-') ? 'Yes' : 'No');
     
     if (!apiKey.startsWith('sk-')) {
       console.error('Invalid OpenAI API key format. OpenAI keys should start with "sk-"');
@@ -42,6 +48,7 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
+    console.log('Making request to OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -65,6 +72,8 @@ app.post('/api/chat', async (req, res) => {
       })
     });
 
+    console.log('OpenAI API response status:', response.status);
+    
     if (!response.ok) {
       const errorData = await response.text();
       console.error('OpenAI API error:', response.status, errorData);
@@ -88,7 +97,9 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const data = await response.json();
+    console.log('OpenAI API response received successfully');
     const aiResponse = data.choices[0].message.content;
+    console.log('AI Response:', aiResponse.substring(0, 100) + '...');
 
     res.json({ response: aiResponse });
 

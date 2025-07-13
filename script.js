@@ -1,8 +1,8 @@
 // Configuration
 const CONFIG = {
-    API_URL: window.location.hostname === 'localhost' ? 
+    API_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 
         'http://localhost:8000/api/chat' : 
-        '/api/chat',
+        `${window.location.origin}/api/chat`,
     MODEL: 'gpt-3.5-turbo',
     MAX_TOKENS: 1000,
     TEMPERATURE: 0.7
@@ -280,6 +280,9 @@ async function sendMessage() {
 }
 
 async function getAIResponse(message) {
+    console.log('Sending request to API:', CONFIG.API_URL);
+    console.log('Message:', message);
+    
     const response = await fetch(CONFIG.API_URL, {
         method: 'POST',
         headers: {
@@ -290,6 +293,8 @@ async function getAIResponse(message) {
             sessionId: currentChatId
         })
     });
+    
+    console.log('API Response status:', response.status);
     
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
@@ -305,6 +310,7 @@ async function getAIResponse(message) {
     }
     
     const data = await response.json();
+    console.log('API Response data:', data);
     return data.response;
 }
 
