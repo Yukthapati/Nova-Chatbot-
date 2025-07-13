@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "echo 'Build complete - static files ready for deployment'"
+    "build": "vite build",
+    "heroku-postbuild": "npm run build"
   },
   "dependencies": {
     "express": "^4.18.2",
