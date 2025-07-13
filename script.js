@@ -1,7 +1,6 @@
 // Configuration
 const CONFIG = {
-    API_KEY: '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',
-    API_URL: 'https://api.openai.com/v1/chat/completions',
+    API_URL: '/.netlify/functions/chat',
     MODEL: 'gpt-3.5-turbo',
     MAX_TOKENS: 1000,
     TEMPERATURE: 0.7
@@ -280,35 +279,15 @@ async function sendMessage() {
 
 async function getAIResponse(message) {
     const chat = chatHistory.find(c => c.id === currentChatId);
-    const messages = chat ? chat.messages : [];
-    
-    // Prepare messages for API
-    const apiMessages = [
-        {
-            role: 'system',
-            content: 'You are Nova, a helpful and friendly AI assistant. You can answer questions on any topic. Be conversational, informative, and engaging in your responses. Keep responses concise but comprehensive.'
-        },
-        ...messages.map(msg => ({
-            role: msg.role,
-            content: msg.content
-        })),
-        {
-            role: 'user',
-            content: message
-        }
-    ];
     
     const response = await fetch(CONFIG.API_URL, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${CONFIG.API_KEY}`
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            model: CONFIG.MODEL,
-            messages: apiMessages,
-            max_tokens: CONFIG.MAX_TOKENS,
-            temperature: CONFIG.TEMPERATURE
+            message: message,
+            sessionId: currentChatId
         })
     });
     
@@ -317,7 +296,7 @@ async function getAIResponse(message) {
     }
     
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.response;
 }
 
 function addMessage(role, content) {
