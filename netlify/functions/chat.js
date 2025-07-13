@@ -30,7 +30,7 @@ exports.handler = async (event, context) => {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY || 'AIzaSyChoOY5ZGA4VNjQ1q0pwCZtIVAvrsN5q0c'}`,
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY || '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'}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({

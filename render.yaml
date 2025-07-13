@@ -6,6 +6,6 @@ services:
     startCommand: npm start
     envVars:
       - key: OPENAI_API_KEY
-        value: AIzaSyChoOY5ZGA4VNjQ1q0pwCZtIVAvrsN5q0c
+        value: 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
       - key: NODE_ENV
         value: production

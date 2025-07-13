@@ -32,7 +32,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Check if API key is properly configured
-    const apiKey = process.env.OPENAI_API_KEY || 'AIzaSyChoOY5ZGA4VNjQ1q0pwCZtIVAvrsN5q0c';
+    const apiKey = process.env.OPENAI_API_KEY || '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';
     
     if (!apiKey.startsWith('sk-')) {
       console.error('Invalid OpenAI API key format. OpenAI keys should start with "sk-"');
