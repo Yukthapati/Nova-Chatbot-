@@ -31,10 +31,21 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
+    // Check if API key is properly configured
+    const apiKey = process.env.OPENAI_API_KEY || 'AIzaSyChoOY5ZGA4VNjQ1q0pwCZtIVAvrsN5q0c';
+    
+    if (!apiKey.startsWith('sk-')) {
+      console.error('Invalid OpenAI API key format. OpenAI keys should start with "sk-"');
+      return res.status(500).json({ 
+        error: 'API configuration error',
+        details: 'Invalid API key format. Please check your OpenAI API key.' 
+      });
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY || 'AIzaSyChoOY5ZGA4VNjQ1q0pwCZtIVAvrsN5q0c'}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -57,7 +68,23 @@ app.post('/api/chat', async (req, res) => {
     if (!response.ok) {
       const errorData = await response.text();
       console.error('OpenAI API error:', response.status, errorData);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      
+      if (response.status === 401) {
+        return res.status(401).json({ 
+          error: 'Authentication failed',
+          details: 'Invalid OpenAI API key. Please check your API key configuration.' 
+        });
+      } else if (response.status === 429) {
+        return res.status(429).json({ 
+          error: 'Rate limit exceeded',
+          details: 'Too many requests. Please try again later.' 
+        });
+      } else {
+        return res.status(500).json({ 
+          error: 'OpenAI API error',
+          details: `API returned status ${response.status}` 
+        });
+      }
     }
 
     const data = await response.json();

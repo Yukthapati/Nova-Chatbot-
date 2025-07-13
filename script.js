@@ -292,9 +292,16 @@ async function getAIResponse(message) {
     });
     
     if (!response.ok) {
-        const errorData = await response.text();
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         console.error('API Error:', response.status, errorData);
-        throw new Error(`API request failed: ${response.status}`);
+        
+        if (response.status === 401) {
+            throw new Error('Authentication failed. Please check the API key configuration.');
+        } else if (response.status === 429) {
+            throw new Error('Rate limit exceeded. Please try again in a moment.');
+        } else {
+            throw new Error(errorData.details || `API request failed: ${response.status}`);
+        }
     }
     
     const data = await response.json();

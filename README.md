@@ -108,10 +108,17 @@ A beautiful, responsive general-purpose chatbot powered by OpenAI's GPT-3.5 Turb
    - Navigate to the [API Keys section](https://platform.openai.com/api-keys)
    - Click "Create new secret key"
    - Copy your API key (keep it secure!)
+   - **Important**: OpenAI API keys start with `sk-` (e.g., `sk-1234567890abcdef...`)
 
 3. **Set Up Billing**
    - Go to [Billing settings](https://platform.openai.com/account/billing)
    - Add a payment method to enable API usage
+
+### ⚠️ Common Issues
+
+- **Wrong API Key**: Make sure you're using an OpenAI API key (starts with `sk-`), not a Google API key
+- **No Billing**: OpenAI requires a payment method to be added for API usage
+- **Rate Limits**: Free tier has usage limits; consider upgrading for higher limits
 
 ## 📖 Usage Guide
 
