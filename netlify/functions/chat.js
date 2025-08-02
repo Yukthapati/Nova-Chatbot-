@@ -31,6 +31,7 @@ exports.handler = async (event, context) => {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY || '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'}`,
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({

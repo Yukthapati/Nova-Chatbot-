@@ -35,10 +35,18 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Check if API key is properly configured
-    const apiKey = process.env.OPENAI_API_KEY || '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';
+    const apiKey = process.env.OPENAI_API_KEY;
     
     console.log('API Key configured:', apiKey ? 'Yes' : 'No');
-    console.log('API Key format valid:', apiKey.startsWith('sk-') ? 'Yes' : 'No');
+    console.log('API Key format valid:', apiKey && apiKey.startsWith('sk-') ? 'Yes' : 'No');
+    
+    if (!apiKey) {
+      console.error('OpenAI API key not configured. Please set OPENAI_API_KEY environment variable.');
+      return res.status(500).json({ 
+        error: 'API configuration error',
+        details: 'OpenAI API key not configured. Please set OPENAI_API_KEY environment variable.' 
+      });
+    }
     
     if (!apiKey.startsWith('sk-')) {
       console.error('Invalid OpenAI API key format. OpenAI keys should start with "sk-"');
