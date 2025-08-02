@@ -3,215 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova AI - Intelligent Assistant</title>
+    <title>ChatGPT Clone</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Auth Check -->
-    <script>
-        // Check authentication on page load
-        window.addEventListener('load', function() {
-            const user = localStorage.getItem('nova_user');
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-        });
-    </script>
-
-    <!-- Background Animation -->
-    <div class="background-animation">
-        <div class="floating-shape shape-1"></div>
-        <div class="floating-shape shape-2"></div>
-        <div class="floating-shape shape-3"></div>
-        <div class="floating-shape shape-4"></div>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" id="newChatBtn">
+                <i class="fas fa-plus"></i>
+                New chat
+            </button>
+        </div>
+        
+        <div class="chat-history" id="chatHistory">
+            <!-- Chat history will be populated here -->
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="user-name">User</span>
+            </div>
+        </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="logo-text">
-                        <h1>Nova AI</h1>
-                        <span class="user-indicator" id="userIndicator">Demo User</span>
-                    </div>
-                </div>
-                <button class="new-chat-btn" id="newChatBtn">
-                    <i class="fas fa-plus"></i>
-                    New Chat
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>ChatGPT Clone</h1>
+            <div class="header-actions">
+                <button class="clear-btn" id="clearBtn" title="Clear conversation">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
-            
-            <!-- Search Bar -->
-            <div class="search-section">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInput" placeholder="Search conversations..." class="search-input">
-                    <button class="search-clear" id="searchClear" style="display: none;">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="chat-history">
-                <div class="history-header">
-                    <h3>Recent Chats</h3>
-                    <button class="clear-all-btn" id="clearAllBtn" title="Clear All Chats">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-                <div class="chat-list" id="chatList">
-                    <!-- Chat history items will be populated here -->
-                </div>
-            </div>
-            
-            <div class="sidebar-footer">
-                <div class="user-info" id="userInfo">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="user-details">
-                        <span class="user-name" id="userName">Demo User</span>
-                        <span class="user-status">Online</span>
-                    </div>
-                    <button class="logout-btn" id="logoutBtn" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
-            </div>
         </div>
 
-        <!-- Main Chat Area -->
-        <div class="main-chat">
-            <!-- Header -->
-            <div class="chat-header">
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="chat-info">
-                    <div class="bot-avatar">
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer">
+            <!-- Welcome Screen -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-content">
+                    <div class="logo">
                         <i class="fas fa-robot"></i>
-                        <div class="status-indicator"></div>
                     </div>
-                    <div class="bot-details">
-                        <h2>Nova AI</h2>
-                        <span class="bot-status">AI Assistant • Online</span>
+                    <h1>ChatGPT Clone</h1>
+                    <p>How can I help you today?</p>
+                    
+                    <div class="example-prompts">
+                        <div class="prompt-card" data-prompt="Explain quantum physics in simple terms">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Explain quantum physics</span>
+                        </div>
+                        <div class="prompt-card" data-prompt="Write a creative story about space exploration">
+                            <i class="fas fa-pen"></i>
+                            <span>Write a creative story</span>
+                        </div>
+                        <div class="prompt-card" data-prompt="Help me plan a healthy meal">
+                            <i class="fas fa-utensils"></i>
+                            <span>Plan a healthy meal</span>
+                        </div>
+                        <div class="prompt-card" data-prompt="Explain how machine learning works">
+                            <i class="fas fa-brain"></i>
+                            <span>Explain machine learning</span>
+                        </div>
                     </div>
-                </div>
-                <div class="chat-actions">
-                    <button class="action-btn" id="clearChatBtn" title="Clear Chat">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="action-btn" id="settingsBtn" title="Settings">
-                        <i class="fas fa-cog"></i>
-                    </button>
                 </div>
             </div>
 
-            <!-- Messages Container -->
-            <div class="messages-container" id="messagesContainer">
-                <div class="welcome-screen" id="welcomeScreen">
-                    <div class="welcome-content">
-                        <div class="welcome-icon">
-                            <i class="fas fa-robot"></i>
-                            <div class="sparkle sparkle-1">✨</div>
-                            <div class="sparkle sparkle-2">⭐</div>
-                            <div class="sparkle sparkle-3">💫</div>
-                        </div>
-                        <h1>Welcome to Nova AI</h1>
-                        <p>Your intelligent assistant for any question, any topic, any time. Let's explore the world of knowledge together!</p>
-                        
-                        <div class="quick-actions">
-                            <div class="quick-action" data-prompt="Explain quantum physics in simple terms">
-                                <div class="action-icon">
-                                    <i class="fas fa-atom"></i>
-                                </div>
-                                <div class="action-content">
-                                    <h3>Explain Concepts</h3>
-                                    <p>Get clear explanations on any topic</p>
-                                </div>
-                            </div>
-                            <div class="quick-action" data-prompt="Write a creative short story about space exploration">
-                                <div class="action-icon">
-                                    <i class="fas fa-pen-fancy"></i>
-                                </div>
-                                <div class="action-content">
-                                    <h3>Creative Writing</h3>
-                                    <p>Generate stories and creative content</p>
-                                </div>
-                            </div>
-                            <div class="quick-action" data-prompt="Help me debug this JavaScript code">
-                                <div class="action-icon">
-                                    <i class="fas fa-code"></i>
-                                </div>
-                                <div class="action-content">
-                                    <h3>Code Help</h3>
-                                    <p>Debug and improve your code</p>
-                                </div>
-                            </div>
-                            <div class="quick-action" data-prompt="Plan a productive daily schedule">
-                                <div class="action-icon">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <div class="action-content">
-                                    <h3>Planning</h3>
-                                    <p>Get productivity tips and schedules</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="messages" id="messages">
-                    <!-- Messages will be populated here -->
-                </div>
+            <!-- Messages -->
+            <div class="messages" id="messages">
+                <!-- Messages will be populated here -->
             </div>
+        </div>
 
-            <!-- Input Area -->
-            <div class="input-area">
-                <div class="input-container">
-                    <div class="input-wrapper">
-                        <textarea 
-                            id="messageInput" 
-                            placeholder="Ask Nova anything..." 
-                            rows="1"
-                            maxlength="2000"
-                        ></textarea>
-                        <div class="input-actions">
-                            <button class="attach-btn" title="Attach File">
-                                <i class="fas fa-paperclip"></i>
-                            </button>
-                            <button class="send-btn" id="sendBtn" title="Send Message">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="input-footer">
-                        <span class="character-count">0/2000</span>
-                        <span class="powered-by">Powered by OpenAI GPT-3.5</span>
-                    </div>
-                </div>
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-container">
+                <textarea 
+                    id="messageInput" 
+                    placeholder="Message ChatGPT..." 
+                    rows="1"
+                ></textarea>
+                <button class="send-btn" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="input-footer">
+                <p>ChatGPT can make mistakes. Consider checking important information.</p>
             </div>
         </div>
     </div>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            <p>Nova is thinking...</p>
+    <!-- API Key Modal -->
+    <div class="modal-overlay" id="apiKeyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>OpenAI API Key Required</h2>
+            </div>
+            <div class="modal-body">
+                <p>To use this chatbot, you need to provide your OpenAI API key.</p>
+                <div class="input-group">
+                    <label for="apiKeyInput">API Key:</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-...">
+                </div>
+                <div class="modal-info">
+                    <p><strong>How to get your API key:</strong></p>
+                    <ol>
+                        <li>Go to <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Keys</a></li>
+                        <li>Create a new secret key</li>
+                        <li>Copy and paste it above</li>
+                    </ol>
+                    <p><small>Your API key is stored locally in your browser and never sent to any third party.</small></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn-primary" id="saveApiKeyBtn">Save & Continue</button>
+            </div>
         </div>
     </div>
-
-    <!-- Toast Notifications -->
-    <div class="toast-container" id="toastContainer"></div>
 
     <script src="script.js"></script>
 </body>

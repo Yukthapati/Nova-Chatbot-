@@ -1,82 +1,37 @@
-// Configuration
-const CONFIG = {
-    API_URL: '/api/chat',
-    MODEL: 'gpt-3.5-turbo',
-    MAX_TOKENS: 1000,
-    TEMPERATURE: 0.7
-};
-
 // Global variables
 let currentChatId = null;
 let chatHistory = [];
-let isLoading = false;
-let currentUser = null;
+let apiKey = null;
 
 // DOM elements
 const elements = {
     sidebar: document.getElementById('sidebar'),
     sidebarToggle: document.getElementById('sidebarToggle'),
     newChatBtn: document.getElementById('newChatBtn'),
-    clearChatBtn: document.getElementById('clearChatBtn'),
-    messagesContainer: document.getElementById('messagesContainer'),
+    clearBtn: document.getElementById('clearBtn'),
+    chatHistory: document.getElementById('chatHistory'),
     welcomeScreen: document.getElementById('welcomeScreen'),
     messages: document.getElementById('messages'),
+    chatContainer: document.getElementById('chatContainer'),
     messageInput: document.getElementById('messageInput'),
     sendBtn: document.getElementById('sendBtn'),
-    chatList: document.getElementById('chatList'),
-    loadingOverlay: document.getElementById('loadingOverlay'),
-    toastContainer: document.getElementById('toastContainer'),
-    searchInput: document.getElementById('searchInput'),
-    searchClear: document.getElementById('searchClear'),
-    clearAllBtn: document.getElementById('clearAllBtn'),
-    logoutBtn: document.getElementById('logoutBtn'),
-    userIndicator: document.getElementById('userIndicator'),
-    userName: document.getElementById('userName')
+    apiKeyModal: document.getElementById('apiKeyModal'),
+    apiKeyInput: document.getElementById('apiKeyInput'),
+    saveApiKeyBtn: document.getElementById('saveApiKeyBtn'),
+    cancelBtn: document.getElementById('cancelBtn')
 };
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    checkAuthentication();
     initializeApp();
     setupEventListeners();
     loadChatHistory();
+    checkApiKey();
 });
 
-function checkAuthentication() {
-    const userData = localStorage.getItem('nova_user');
-    if (!userData) {
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    currentUser = JSON.parse(userData);
-    updateUserInterface();
-}
-
-function updateUserInterface() {
-    if (currentUser) {
-        elements.userIndicator.textContent = currentUser.name;
-        elements.userName.textContent = currentUser.name;
-        
-        // Update avatar based on user type
-        const avatar = document.querySelector('.user-avatar i');
-        if (currentUser.type === 'demo') {
-            avatar.className = 'fas fa-user-circle';
-        } else {
-            avatar.className = 'fab fa-google';
-        }
-    }
-}
-
 function initializeApp() {
-    // Create initial chat session
     createNewChat();
-    
-    // Auto-resize textarea
     autoResizeTextarea();
-    
-    // Update character count
-    updateCharacterCount();
 }
 
 function setupEventListeners() {
@@ -87,13 +42,7 @@ function setupEventListeners() {
     elements.newChatBtn.addEventListener('click', createNewChat);
     
     // Clear chat button
-    elements.clearChatBtn.addEventListener('click', clearCurrentChat);
-    
-    // Clear all chats button
-    elements.clearAllBtn.addEventListener('click', clearAllChats);
-    
-    // Logout button
-    elements.logoutBtn.addEventListener('click', logout);
+    elements.clearBtn.addEventListener('click', clearCurrentChat);
     
     // Send message
     elements.sendBtn.addEventListener('click', sendMessage);
@@ -109,22 +58,21 @@ function setupEventListeners() {
     // Auto-resize textarea
     elements.messageInput.addEventListener('input', function() {
         autoResizeTextarea();
-        updateCharacterCount();
         toggleSendButton();
     });
     
-    // Search functionality
-    elements.searchInput.addEventListener('input', handleSearch);
-    elements.searchClear.addEventListener('click', clearSearch);
-    
-    // Quick action buttons
-    document.querySelectorAll('.quick-action').forEach(action => {
-        action.addEventListener('click', function() {
+    // Example prompts
+    document.querySelectorAll('.prompt-card').forEach(card => {
+        card.addEventListener('click', function() {
             const prompt = this.getAttribute('data-prompt');
             elements.messageInput.value = prompt;
             sendMessage();
         });
     });
+    
+    // API Key modal
+    elements.saveApiKeyBtn.addEventListener('click', saveApiKey);
+    elements.cancelBtn.addEventListener('click', hideApiKeyModal);
     
     // Close sidebar when clicking outside on mobile
     document.addEventListener('click', function(e) {
@@ -137,56 +85,37 @@ function setupEventListeners() {
     });
 }
 
-function handleSearch() {
-    const query = elements.searchInput.value.toLowerCase().trim();
-    const chatItems = document.querySelectorAll('.chat-item');
-    
-    if (query === '') {
-        // Show all chats
-        chatItems.forEach(item => {
-            item.classList.remove('hidden', 'highlighted');
-        });
-        elements.searchClear.style.display = 'none';
+function checkApiKey() {
+    apiKey = localStorage.getItem('openai_api_key');
+    if (!apiKey) {
+        showApiKeyModal();
+    }
+}
+
+function showApiKeyModal() {
+    elements.apiKeyModal.style.display = 'flex';
+}
+
+function hideApiKeyModal() {
+    elements.apiKeyModal.style.display = 'none';
+}
+
+function saveApiKey() {
+    const key = elements.apiKeyInput.value.trim();
+    if (!key) {
+        alert('Please enter your API key');
         return;
     }
     
-    elements.searchClear.style.display = 'block';
+    if (!key.startsWith('sk-')) {
+        alert('Invalid API key format. OpenAI API keys start with "sk-"');
+        return;
+    }
     
-    chatItems.forEach(item => {
-        const title = item.querySelector('.chat-item-title').textContent.toLowerCase();
-        const preview = item.querySelector('.chat-item-preview').textContent.toLowerCase();
-        
-        if (title.includes(query) || preview.includes(query)) {
-            item.classList.remove('hidden');
-            item.classList.add('highlighted');
-        } else {
-            item.classList.add('hidden');
-            item.classList.remove('highlighted');
-        }
-    });
-}
-
-function clearSearch() {
-    elements.searchInput.value = '';
-    handleSearch();
-}
-
-function clearAllChats() {
-    if (confirm('Are you sure you want to delete all chat history? This action cannot be undone.')) {
-        chatHistory = [];
-        saveChatHistory();
-        updateChatList();
-        createNewChat();
-        showToast('All chats cleared!', 'success');
-    }
-}
-
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('nova_user');
-        localStorage.removeItem('nova_chat_history');
-        window.location.href = 'login.html';
-    }
+    apiKey = key;
+    localStorage.setItem('openai_api_key', key);
+    hideApiKeyModal();
+    elements.apiKeyInput.value = '';
 }
 
 function toggleSidebar() {
@@ -208,11 +137,10 @@ function createNewChat() {
     
     chatHistory.unshift(newChat);
     saveChatHistory();
-    updateChatList();
+    updateChatHistoryUI();
     clearMessages();
     showWelcomeScreen();
-    
-    showToast('New chat created!', 'success');
+    closeSidebar();
 }
 
 function clearCurrentChat() {
@@ -223,7 +151,6 @@ function clearCurrentChat() {
             saveChatHistory();
             clearMessages();
             showWelcomeScreen();
-            showToast('Chat cleared!', 'success');
         }
     }
 }
@@ -233,8 +160,13 @@ function generateChatId() {
 }
 
 async function sendMessage() {
+    if (!apiKey) {
+        showApiKeyModal();
+        return;
+    }
+    
     const message = elements.messageInput.value.trim();
-    if (!message || isLoading) return;
+    if (!message) return;
     
     // Hide welcome screen and show messages
     hideWelcomeScreen();
@@ -245,14 +177,10 @@ async function sendMessage() {
     // Clear input
     elements.messageInput.value = '';
     autoResizeTextarea();
-    updateCharacterCount();
     toggleSendButton();
     
     // Show typing indicator
     showTypingIndicator();
-    
-    // Set loading state
-    setLoadingState(true);
     
     try {
         // Get AI response
@@ -262,7 +190,7 @@ async function sendMessage() {
         hideTypingIndicator();
         
         // Add AI message
-        addMessage('bot', response);
+        addMessage('assistant', response);
         
         // Update chat title if it's the first message
         updateChatTitle(message);
@@ -270,46 +198,47 @@ async function sendMessage() {
     } catch (error) {
         console.error('Error getting AI response:', error);
         hideTypingIndicator();
-        addMessage('bot', 'Sorry, I encountered an error while processing your request. Please try again.');
-        showToast('Failed to get response. Please try again.', 'error');
-    } finally {
-        setLoadingState(false);
+        addMessage('assistant', 'Sorry, I encountered an error while processing your request. Please try again.');
+        
+        if (error.message.includes('401') || error.message.includes('Invalid API key')) {
+            localStorage.removeItem('openai_api_key');
+            apiKey = null;
+            showApiKeyModal();
+        }
     }
 }
 
 async function getAIResponse(message) {
-    console.log('Sending request to API:', CONFIG.API_URL);
-    console.log('Message:', message);
-    
-    const response = await fetch(CONFIG.API_URL, {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
+            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            message: message,
-            sessionId: currentChatId
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are a helpful assistant. Provide clear, concise, and helpful responses.'
+                },
+                {
+                    role: 'user',
+                    content: message
+                }
+            ],
+            max_tokens: 1000,
+            temperature: 0.7
         })
     });
     
-    console.log('API Response status:', response.status);
-    
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('API Error:', response.status, errorData);
-        
-        if (response.status === 401) {
-            throw new Error('Authentication failed. Please check the API key configuration.');
-        } else if (response.status === 429) {
-            throw new Error('Rate limit exceeded. Please try again in a moment.');
-        } else {
-            throw new Error(errorData.details || `API request failed: ${response.status}`);
-        }
+        const errorData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+        throw new Error(`API request failed: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
     }
     
     const data = await response.json();
-    console.log('API Response data:', data);
-    return data.response;
+    return data.choices[0].message.content;
 }
 
 function addMessage(role, content) {
@@ -324,7 +253,7 @@ function addMessage(role, content) {
     
     chat.messages.push(message);
     saveChatHistory();
-    updateChatList();
+    updateChatHistoryUI();
     
     // Create message element
     const messageElement = createMessageElement(message);
@@ -336,7 +265,7 @@ function addMessage(role, content) {
 
 function createMessageElement(message) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${message.role}`;
+    messageDiv.className = `message ${message.role === 'user' ? 'user-message' : 'bot-message'}`;
     
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
@@ -345,21 +274,27 @@ function createMessageElement(message) {
     const content = document.createElement('div');
     content.className = 'message-content';
     
-    const bubble = document.createElement('div');
-    bubble.className = 'message-bubble';
-    bubble.textContent = message.content;
-    
-    const time = document.createElement('div');
-    time.className = 'message-time';
-    time.textContent = formatTime(message.timestamp);
-    
-    content.appendChild(bubble);
-    content.appendChild(time);
+    // Format message content (handle code blocks, etc.)
+    content.innerHTML = formatMessage(message.content);
     
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);
     
     return messageDiv;
+}
+
+function formatMessage(content) {
+    // Simple formatting for code blocks and inline code
+    content = content.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Convert line breaks to paragraphs
+    const paragraphs = content.split('\n\n').filter(p => p.trim());
+    if (paragraphs.length > 1) {
+        return paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    } else {
+        return `<p>${content.replace(/\n/g, '<br>')}</p>`;
+    }
 }
 
 function showTypingIndicator() {
@@ -371,12 +306,12 @@ function showTypingIndicator() {
     avatar.className = 'message-avatar';
     avatar.innerHTML = '<i class="fas fa-robot"></i>';
     
-    const bubble = document.createElement('div');
-    bubble.className = 'typing-bubble';
-    bubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    const dots = document.createElement('div');
+    dots.className = 'typing-dots';
+    dots.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
     
     typingDiv.appendChild(avatar);
-    typingDiv.appendChild(bubble);
+    typingDiv.appendChild(dots);
     
     elements.messages.appendChild(typingDiv);
     scrollToBottom();
@@ -408,24 +343,16 @@ function updateChatTitle(firstMessage) {
     if (chat && chat.title === 'New Chat') {
         chat.title = firstMessage.length > 30 ? firstMessage.substring(0, 30) + '...' : firstMessage;
         saveChatHistory();
-        updateChatList();
+        updateChatHistoryUI();
     }
 }
 
-function updateChatList() {
-    elements.chatList.innerHTML = '';
-    
-    if (chatHistory.length === 0) {
-        const emptyState = document.createElement('div');
-        emptyState.className = 'empty-state';
-        emptyState.innerHTML = '<p>No chats yet. Start a conversation!</p>';
-        elements.chatList.appendChild(emptyState);
-        return;
-    }
+function updateChatHistoryUI() {
+    elements.chatHistory.innerHTML = '';
     
     chatHistory.forEach(chat => {
         const chatItem = createChatItem(chat);
-        elements.chatList.appendChild(chatItem);
+        elements.chatHistory.appendChild(chatItem);
     });
 }
 
@@ -433,26 +360,17 @@ function createChatItem(chat) {
     const chatItem = document.createElement('div');
     chatItem.className = `chat-item ${chat.id === currentChatId ? 'active' : ''}`;
     
-    const lastMessage = chat.messages.length > 0 ? 
-        chat.messages[chat.messages.length - 1].content : 
-        'No messages yet';
-    
     chatItem.innerHTML = `
-        <div class="chat-item-content">
-            <div class="chat-item-text">
-                <div class="chat-item-title">${chat.title}</div>
-                <div class="chat-item-preview">${lastMessage.substring(0, 50)}${lastMessage.length > 50 ? '...' : ''}</div>
-            </div>
-            <div class="chat-item-actions">
-                <button class="chat-action-btn delete-btn" onclick="deleteChat('${chat.id}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
+        <span class="chat-item-text">${chat.title}</span>
+        <div class="chat-item-actions">
+            <button class="delete-btn" onclick="deleteChat('${chat.id}')">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
     `;
     
     chatItem.addEventListener('click', function(e) {
-        if (!e.target.closest('.chat-action-btn')) {
+        if (!e.target.closest('.delete-btn')) {
             loadChat(chat.id);
         }
     });
@@ -478,7 +396,7 @@ function loadChat(chatId) {
         scrollToBottom();
     }
     
-    updateChatList();
+    updateChatHistoryUI();
     closeSidebar();
 }
 
@@ -497,14 +415,12 @@ function deleteChat(chatId) {
         }
     }
     
-    updateChatList();
-    showToast('Chat deleted!', 'success');
+    updateChatHistoryUI();
 }
 
 function saveChatHistory() {
     try {
-        const userKey = currentUser ? `nova_chat_history_${currentUser.type}` : 'nova_chat_history';
-        localStorage.setItem(userKey, JSON.stringify(chatHistory));
+        localStorage.setItem('chat_history', JSON.stringify(chatHistory));
     } catch (error) {
         console.error('Failed to save chat history:', error);
     }
@@ -512,11 +428,10 @@ function saveChatHistory() {
 
 function loadChatHistory() {
     try {
-        const userKey = currentUser ? `nova_chat_history_${currentUser.type}` : 'nova_chat_history';
-        const saved = localStorage.getItem(userKey);
+        const saved = localStorage.getItem('chat_history');
         if (saved) {
             chatHistory = JSON.parse(saved);
-            updateChatList();
+            updateChatHistoryUI();
             
             if (chatHistory.length > 0) {
                 loadChat(chatHistory[0].id);
@@ -528,73 +443,22 @@ function loadChatHistory() {
     }
 }
 
-function setLoadingState(loading) {
-    isLoading = loading;
-    elements.sendBtn.disabled = loading;
-    elements.messageInput.disabled = loading;
-    
-    if (loading) {
-        elements.loadingOverlay.style.display = 'flex';
-    } else {
-        elements.loadingOverlay.style.display = 'none';
-    }
-}
-
 function autoResizeTextarea() {
     const textarea = elements.messageInput;
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
 }
 
-function updateCharacterCount() {
-    const count = elements.messageInput.value.length;
-    const counter = document.querySelector('.character-count');
-    if (counter) {
-        counter.textContent = `${count}/2000`;
-        counter.style.color = count > 1800 ? '#ff4757' : '#999';
-    }
-}
-
 function toggleSendButton() {
     const hasText = elements.messageInput.value.trim().length > 0;
-    elements.sendBtn.style.opacity = hasText ? '1' : '0.5';
+    elements.sendBtn.disabled = !hasText;
 }
 
 function scrollToBottom() {
     setTimeout(() => {
-        elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+        elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
     }, 100);
 }
 
-function formatTime(timestamp) {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    
-    elements.toastContainer.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
-}
-
-// Utility functions
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Export functions for global access
+// Make deleteChat available globally
 window.deleteChat = deleteChat;
