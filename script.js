@@ -1,8 +1,6 @@
 // Configuration
 const CONFIG = {
-    API_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 
-        'http://localhost:8000/api/chat' : 
-        `${window.location.origin}/api/chat`,
+    API_URL: '/api/chat',
     MODEL: 'gpt-3.5-turbo',
     MAX_TOKENS: 1000,
     TEMPERATURE: 0.7

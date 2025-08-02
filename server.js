@@ -38,7 +38,6 @@ app.post('/api/chat', async (req, res) => {
     const apiKey = process.env.OPENAI_API_KEY;
     
     console.log('API Key configured:', apiKey ? 'Yes' : 'No');
-    console.log('API Key format valid:', apiKey && apiKey.startsWith('sk-') ? 'Yes' : 'No');
     
     if (!apiKey) {
       console.error('OpenAI API key not configured. Please set OPENAI_API_KEY environment variable.');
